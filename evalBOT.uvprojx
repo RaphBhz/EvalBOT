@@ -385,14 +385,24 @@
           <GroupName>Source Group 1</GroupName>
           <Files>
             <File>
-              <FileName>Rk_Config_Moteur.s</FileName>
+              <FileName>Bumpers.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\Rk_Config_Moteur.s</FilePath>
+              <FilePath>.\src\Bumpers.s</FilePath>
             </File>
             <File>
-              <FileName>RK_PriseEnMain_Moteur.s</FileName>
+              <FileName>Leds.s</FileName>
               <FileType>2</FileType>
-              <FilePath>.\src\RK_PriseEnMain_Moteur.s</FilePath>
+              <FilePath>.\src\Leds.s</FilePath>
+            </File>
+            <File>
+              <FileName>Moteur.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\Moteur.s</FilePath>
+            </File>
+            <File>
+              <FileName>Main.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>.\src\Main.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -441,5 +451,14 @@
       </file>
     </files>
   </RTE>
+
+  <LayerInfo>
+    <Layers>
+      <Layer>
+        <LayName>evalBOT</LayName>
+        <LayPrjMark>1</LayPrjMark>
+      </Layer>
+    </Layers>
+  </LayerInfo>
 
 </Project>
