@@ -1,8 +1,6 @@
 	;; RK - Evalbot (Cortex M3 de Texas Instrument)
 ; programme - Pilotage 2 Moteurs Evalbot par PWM tout en ASM (Evalbot tourne sur lui même)
 ; This register controls the clock gating logic in normal Run mode
-SYSCTL_PERIPH_GPIO EQU		0x400FE108	; SYSCTL_RCGC2_R (p291 datasheet de lm3s9b92.pdf)
-
 
 		AREA    |.text|, CODE, READONLY
 		ENTRY
@@ -10,7 +8,8 @@ SYSCTL_PERIPH_GPIO EQU		0x400FE108	; SYSCTL_RCGC2_R (p291 datasheet de lm3s9b92.
 		
 		;; The IMPORT command specifies that a symbol is defined in a shared object at runtime.
 		IMPORT	MOTEUR_INIT					; initialise les moteurs (configure les pwms + GPIO)
-		IMPORT BUMPER1_INIT					; Initialise le Bumper1
+		IMPORT  BUMPERS_INIT				; Initialise les Bumpers
+		IMPORT  LEDS_INIT
 		
 		; Fonctions Moteur Droit
 		IMPORT	MOTEUR_DROIT_ON				; activer le moteur droit
@@ -27,20 +26,25 @@ SYSCTL_PERIPH_GPIO EQU		0x400FE108	; SYSCTL_RCGC2_R (p291 datasheet de lm3s9b92.
 		IMPORT  MOTEUR_GAUCHE_INVERSE		; inverse le sens de rotation du moteur gauche
 			
 		; Fonctions Bumper1
-		IMPORT WAIT_BUMPER1					; Attent l'activation du Bumper1
+		IMPORT  READ_BUMPERS				; Lis la valeur d'activation des Bumpers
+			
+		; Fonctions LEDS
+		IMPORT  LEDS_ON						; Active les LEDs
+		IMPORT  LEDS_OFF					; Désactive les LEDs
 		
 ; FONCTION PRINCIPALE
 
 __main	
 
 		; Configure les PWM + GPIO
-		BL  MOTEUR_INIT	   
-		; Configure les Bumpers
-		BL  BUMPER1_INIT
+		BL  MOTEUR_INIT
+		BL  BUMPERS_INIT
+		BL  LEDS_INIT
 		
 		; Activer les deux moteurs droit et gauche
 		BL	MOTEUR_DROIT_ON
 		BL	MOTEUR_GAUCHE_ON
+		BL  LEDS_ON
 
 ; Boucle de pilotage : l'Evalbot avace et attend une collision
 ; S'il y a collision, l'Evalbot recule puis
@@ -50,28 +54,40 @@ __main
 
 LOOP	
 		; Evalbot avance droit devant
-		BL MOTEUR_DROIT_AVANT	   
+		BL MOTEUR_DROIT_AVANT
 		BL MOTEUR_GAUCHE_AVANT
 		
-		; Evalbot attent l'activation du Bumper1
-		BL WAIT_BUMPER1
-		; Evalbot ressort donc le Bumper1 est activé
-						
-		; Rotation à droite de l'Evalbot pendant une période (2 WAIT)
-		BL MOTEUR_GAUCHE_INVERSE  ; MOTEUR_GAUCHE_INVERSE
+		; Lecture de la valeur d'activation des Bumpers et écriture dans r2
+		BL READ_BUMPERS
 		
+		; Si aucun Bumper n'est activé (r2 = 3), on continue à boucler
+		CMP r2, #3
+		BGE LOOP
+		
+		; L'Evalbot est coincé, il recule
+		BL MOTEUR_GAUCHE_INVERSE
+		BL MOTEUR_DROIT_INVERSE
+		BL WAIT
+		
+		; Ajoute 1 au nombre de collisions, si on a enchaîné 4 collisions, on allume les LEDs
+		ORR r3, r3, #0x01
+		CMP r3, #4
+		BEQ STUCK
+		
+		; Rotation à droite de l'Evalbot pendant 2 périodes
+		BL MOTEUR_DROIT_INVERSE
 		BL WAIT
 		BL WAIT
-
+		
 		B LOOP
 
-		;; Boucle d'attante de 1s
-WAIT	LDR r1, =0xAFFFFF 
-wait1	SUBS r1, #1
+		;; Boucle d'attente
+WAIT	LDR r4, =0xAFFFFF 
+wait1	SUBS r4, #1
         BNE wait1
-		
-		;; retour à la suite du lien de branchement
 		BX	LR
+		
+STUCK	
 
 		NOP
         END

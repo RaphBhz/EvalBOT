@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\evalBOT.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\evalBOT.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6180002: Last Updated: Wed Nov 16 17:20:03 2022
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6180002: Last Updated: Sun Nov 27 22:18:16 2022
 <BR><P>
 <H3>Maximum Stack Usage =          0 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -12,8 +12,11 @@ Call chain for Maximum Stack Depth:</H3>
 <H3>
 Functions with no stack information
 </H3><UL>
- <LI><a href="#[16]">BUMPER1_INIT</a>
- <LI><a href="#[17]">WAIT_BUMPER1</a>
+ <LI><a href="#[16]">BUMPERS_INIT</a>
+ <LI><a href="#[17]">READ_BUMPERS</a>
+ <LI><a href="#[23]">LEDS_INIT</a>
+ <LI><a href="#[24]">LEDS_ON</a>
+ <LI><a href="#[25]">LEDS_OFF</a>
  <LI><a href="#[18]">MOTEUR_INIT</a>
  <LI><a href="#[19]">MOTEUR_DROIT_ON</a>
  <LI><a href="#[1a]">MOTEUR_DROIT_OFF</a>
@@ -31,8 +34,7 @@ Functions with no stack information
 <P>
 <H3>
 Mutually Recursive functions
-</H3> <LI><a href="#[17]">WAIT_BUMPER1</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[17]">WAIT_BUMPER1</a><BR>
- <LI><a href="#[2]">HardFault_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[2]">HardFault_Handler</a><BR>
+</H3> <LI><a href="#[2]">HardFault_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[2]">HardFault_Handler</a><BR>
  <LI><a href="#[1]">NMI_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[1]">NMI_Handler</a><BR>
  <LI><a href="#[3]">MemManage_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[3]">MemManage_Handler</a><BR>
  <LI><a href="#[4]">BusFault_Handler</a>&nbsp;&nbsp;&nbsp;&rArr;&nbsp;&nbsp;&nbsp;<a href="#[4]">BusFault_Handler</a><BR>
@@ -83,16 +85,23 @@ Function Pointers
 <H3>
 Global Symbols
 </H3>
-<P><STRONG><a name="[16]"></a>BUMPER1_INIT</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, bumpers.o(.text))
+<P><STRONG><a name="[16]"></a>BUMPERS_INIT</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, bumpers.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
 </UL>
 
-<P><STRONG><a name="[17]"></a>WAIT_BUMPER1</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, bumpers.o(.text))
-<BR><BR>[Calls]<UL><LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WAIT_BUMPER1
+<P><STRONG><a name="[17]"></a>READ_BUMPERS</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, bumpers.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
 </UL>
-<BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
-<LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WAIT_BUMPER1
+
+<P><STRONG><a name="[23]"></a>LEDS_INIT</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, leds.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
 </UL>
+
+<P><STRONG><a name="[24]"></a>LEDS_ON</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, leds.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
+</UL>
+
+<P><STRONG><a name="[25]"></a>LEDS_OFF</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, leds.o(.text), UNUSED, KEPT)
 
 <P><STRONG><a name="[18]"></a>MOTEUR_INIT</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, moteur.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
@@ -122,7 +131,9 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
 </UL>
 
-<P><STRONG><a name="[21]"></a>MOTEUR_DROIT_INVERSE</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, moteur.o(.text), UNUSED, KEPT)
+<P><STRONG><a name="[21]"></a>MOTEUR_DROIT_INVERSE</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, moteur.o(.text))
+<BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
+</UL>
 
 <P><STRONG><a name="[22]"></a>MOTEUR_GAUCHE_INVERSE</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, moteur.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[15]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__main
@@ -130,13 +141,16 @@ Global Symbols
 
 <P><STRONG><a name="[15]"></a>__main</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, main.o(.text))
 <BR><BR>[Calls]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_GAUCHE_INVERSE
+<LI><a href="#[21]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_DROIT_INVERSE
 <LI><a href="#[20]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_GAUCHE_AVANT
 <LI><a href="#[1e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_DROIT_AVANT
 <LI><a href="#[1b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_GAUCHE_ON
 <LI><a href="#[19]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_DROIT_ON
 <LI><a href="#[18]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MOTEUR_INIT
-<LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WAIT_BUMPER1
-<LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BUMPER1_INIT
+<LI><a href="#[24]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LEDS_ON
+<LI><a href="#[23]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;LEDS_INIT
+<LI><a href="#[17]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;READ_BUMPERS
+<LI><a href="#[16]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BUMPERS_INIT
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_armcm3.o(.text)
 </UL>

@@ -327,6 +327,4 @@ MOTEUR_GAUCHE_INVERSE
 		str	r0,[r6]
 		BX	LR
 
-
-
 		END
