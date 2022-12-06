@@ -50,7 +50,7 @@ LEDS_INIT
 		; ;; Enable the Port F & D peripheral clock 		(p291 datasheet de lm3s9B96.pdf)
 		ldr r9, = SYSCTL_PERIPH_GPIO  			;; RCGC2
 		ldr	r5, [r9]
-        ORR r5, r5, #0x00000028  				;; Enable clock sur GPIO D et F où sont branchés les leds (0x28 == 0b101000)
+        ORR r5, r5, #0x00000028  				;; Enable clock sur GPIO D et F où sont branchés les leds
         str r5, [r9]
 		
 		; ;; "There must be a delay of 3 system clocks before any GPIO reg. access  (p413 datasheet de lm3s9B92.pdf)
