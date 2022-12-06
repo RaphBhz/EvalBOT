@@ -26,11 +26,18 @@
 		IMPORT  MOTEUR_GAUCHE_INVERSE		; inverse le sens de rotation du moteur gauche
 			
 		; Fonctions Bumper1
-		IMPORT  READ_BUMPERS				; Lis la valeur d'activation des Bumpers
+		IMPORT  READ_BUMPERS				; Lit la valeur d'activation des Bumpers
 			
 		; Fonctions LEDS
 		IMPORT  LEDS_ON						; Active les LEDs
+		IMPORT  LED4_ON						; Active la LED Broche 4
+		IMPORT  LED5_ON						; Active la LED Broche 5
 		IMPORT  LEDS_OFF					; Désactive les LEDs
+			
+		; Fonctions SWITCH
+		IMPORT  SWITCH_INIT					; Initialise le switch
+		IMPORT  READ_SWITCH1				; Lit la valeur d'activation du Switch 1
+		IMPORT  READ_SWITCH2				; Lit la valeur d'activation du Switch 2
 		
 ; FONCTION PRINCIPALE
 
@@ -40,12 +47,25 @@ __main
 		BL  MOTEUR_INIT
 		BL  BUMPERS_INIT
 		BL  LEDS_INIT
+		BL  SWITCH_INIT
+		
+		
+; Attends l'activation du Switch 2 pour commencer le programme		
+STANDBY
+		BL READ_SWITCH2
+		CMP r5, #0
+		BNE STANDBY
 		
 		; Activer les deux moteurs droit et gauche
 		BL	MOTEUR_DROIT_ON
 		BL	MOTEUR_GAUCHE_ON
-		BL  LEDS_ON
 
+		; On définit le nombre de coliisions avant warning à 4 (4 côtés)
+		LDR r3, =0x04
+		
+
+		
+		
 ; Boucle de pilotage : l'Evalbot avace et attend une collision
 ; S'il y a collision, l'Evalbot recule puis
 ; il tourne de 90 degrés sur la droite
@@ -67,27 +87,64 @@ LOOP
 		; L'Evalbot est coincé, il recule
 		BL MOTEUR_GAUCHE_INVERSE
 		BL MOTEUR_DROIT_INVERSE
+		
+		; On vérifie si on a atteint le nombre maximal de collisions
+		LDR r4, =0xAFFFFF 
 		BL WAIT
 		
 		; Ajoute 1 au nombre de collisions, si on a enchaîné 4 collisions, on allume les LEDs
-		ORR r3, r3, #0x01
-		CMP r3, #4
+		SUBS r3, #1
 		BEQ STUCK
 		
-		; Rotation à droite de l'Evalbot pendant 2 périodes
+		; Rotation à droite de l'Evalbot pendant 2 périodes, la LED du côté de la rotation s'allume pendant le virage
+		BL LED5_ON
 		BL MOTEUR_DROIT_INVERSE
+		LDR r4, =0xAFFFFF 
 		BL WAIT
+		LDR r4, =0xAFFFFF 
 		BL WAIT
+		BL LEDS_OFF
+
 		
 		B LOOP
 
-		;; Boucle d'attente
-WAIT	LDR r4, =0xAFFFFF 
-wait1	SUBS r4, #1
-        BNE wait1
+		;; Boucle d'attente, on définit r4 a une valeur précise avant l'appel
+WAIT	
+		SUBS r4, #1
+        BNE WAIT
 		BX	LR
 		
-STUCK	
+		;; L'évalBOT est coincé, il s'arrêtte
+STUCK
+		BL MOTEUR_DROIT_OFF
+		BL MOTEUR_GAUCHE_OFF
 
+		;; L'évalBOT fait clignoter ses LEDs
+WARNING 
+		BL LEDS_ON
+		
+		BL READ_SWITCH1
+		CMP r5, #0
+		BEQ FORCE
+		
+		LDR r4, =0x0AFFFF
+		BL WAIT
+		
+		BL LEDS_OFF
+
+		BL READ_SWITCH1
+		CMP r5, #0
+		BEQ FORCE
+
+		LDR r4, =0x0AFFFF
+		BL WAIT
+		
+		B WARNING
+		
+FORCE
+		BL LEDS_OFF
+		
+		
+		NOP
 		NOP
         END

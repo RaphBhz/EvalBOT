@@ -35,7 +35,7 @@ BUMPERS_INIT
 		;^^^^^^^^^^^^^^^^^^^^^^^^^^^^CONFIGURATION Bumpers
 		ldr r7, = SYSCTL_RCGC2
 		ldr	r2, [r7] 		
-        ORR	r2, r2, #0x00000038  ;; Enable port E GPIO 
+        ORR	r2, r2, #0x00000010  ;; Enable port E GPIO  (38)
         str r2, [r7]
 		
 		;: "There must be a delay of 3 system clocks before any GPIO reg. access  (p413 datasheet de lm3s9B92.pdf)   
@@ -43,20 +43,23 @@ BUMPERS_INIT
 		NOP
 		NOP
 		
-		LDR r8, =GPIO_PORTE_BASE + GPIO_I_DEN	   ;; Enable Digital Function 
-        LDR r2, =BROCHE0_1	
+		LDR r8, =GPIO_PORTE_BASE + GPIO_I_DEN	   ;; Enable Digital Function
+		LDR r2, [r8]
+        ORR r2, r2, #BROCHE0_1	
         STR r2, [r8]  
 
 		LDR r8, =GPIO_PORTE_BASE + GPIO_I_PUR      ;; Pull up
-        LDR r2, =BROCHE0_1	
+		LDR r2, [r8]
+        ORR r2, r2, #BROCHE0_1	
         STR r2, [r8]
 		
-		LDR r8, =GPIO_PORTE_BASE + (BROCHE0_1<<2)  ;; @data Register = @base + (mask<<2) ==> Valeur Bumper
 		;vvvvvvvvvvvvvvvvvvvvvvvvvvvvFin configuration Bumpers
 		BX LR
 		
 READ_BUMPERS
 		;^^^^^^^^^^^^^^^^^^^^^^^^^^^^Lecture du contenu de la valeur d'activation du Bumper 1
+		LDR r8, =GPIO_PORTE_BASE + (BROCHE0_1<<2)  ;; @data Register = @base + (mask<<2) ==> Valeur Bumper
+
 		LDR r2, [r8]
 		
 		BX LR

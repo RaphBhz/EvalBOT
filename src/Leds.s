@@ -28,6 +28,8 @@ GPIO_O_DEN  		EQU 	0x0000051C  ; GPIO Digital Enable (p437 datasheet de lm3s9B92
 GPIO_I_PUR   		EQU 	0x00000510  ; GPIO Pull-Up (p432 datasheet de lm3s9B92.pdf)
 
 ; Broches select
+BROCHE4				EQU		0x10
+BROCHE5				EQU		0x20
 BROCHE4_5			EQU		0x30		; led1 & led2 sur broche 4 et 5
 
 BROCHE6				EQU 	0x40		; bouton poussoir 1
@@ -40,6 +42,8 @@ DUREE   			EQU     0x002FFFFF
 		EXPORT	LEDS_INIT
 		EXPORT  LEDS_ON
 		EXPORT  LEDS_OFF
+		EXPORT 	LED4_ON
+		EXPORT  LED5_ON
 			
 LEDS_INIT
 		;^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^CONFIGURATION LED
@@ -55,30 +59,46 @@ LEDS_INIT
 		nop
 
         ldr r9, = GPIO_PORTF_BASE+GPIO_O_DIR    ;; 1 Pin du portF en sortie (broche 4 : 00010000)
-        ldr r5, = BROCHE4_5 	
+		ldr r5, [r9]
+        orr r5, r5, #BROCHE4_5 	
         str r5, [r9]
 		
 		ldr r9, = GPIO_PORTF_BASE+GPIO_O_DEN	;; Enable Digital Function 
-        ldr r5, = BROCHE4_5		
+		ldr r5, [r9]
+        orr r5, r5, #BROCHE4_5		
         str r5, [r9]
 		
 		ldr r9, = GPIO_PORTF_BASE+GPIO_O_DR2R	;; Choix de l'intensité de sortie (2mA)
-        ldr r5, = BROCHE4_5			
+		ldr r5, [r9]
+        orr r5, r5, #BROCHE4_5			
         str r5, [r9]
 		
-		ldr r9, = GPIO_PORTF_BASE + (BROCHE4_5<<2)  ;; @data Register = @base + (mask<<2) ==> LED1
 		;vvvvvvvvvvvvvvvvvvvvvvvFin configuration LED 
 		
 		BX LR
 		
 LEDS_ON
-        ldr r5, = BROCHE4_5		
-		STR r5, [r9]
+		ldr r9, = GPIO_PORTF_BASE + (BROCHE4_5<<2)  ;; @data Register = @base + (mask<<2) ==> LED1
+        ldr r0, = BROCHE4_5		
+		STR r0, [r9]
 		BX LR
 		
 LEDS_OFF
-        mov r5, #0x00
-		STR r5, [r9]
+		ldr r9, = GPIO_PORTF_BASE + (BROCHE4_5<<2)  ;; @data Register = @base + (mask<<2) ==> LED1
+        mov r0, #0x00
+		STR r0, [r9]
+		BX LR
+
+LED4_ON
+		ldr r9, = GPIO_PORTF_BASE + (BROCHE4_5<<2)  ;; @data Register = @base + (mask<<2) ==> LED1
+		ldr r0, = BROCHE4
+		STR r0, [r9]
+		BX LR
+
+LED5_ON
+		ldr r9, = GPIO_PORTF_BASE + (BROCHE4_5<<2)  ;; @data Register = @base + (mask<<2) ==> LED1
+		ldr r0, = BROCHE5
+		STR r0, [r9]
 		BX LR
 
 		NOP
