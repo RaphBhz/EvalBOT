@@ -59,8 +59,11 @@ PWM1GENA		EQU		PWM_BASE+0x0A0
 PWM1GENB		EQU		PWM_BASE+0x0A4
 
 
-VITESSE			EQU		0x1B2	; Valeures plus petites => Vitesse plus rapide exemple 0x192
-								; Valeures plus grandes => Vitesse moins rapide exemple 0x1B2
+VITESSE			EQU		0x199	; Valeurs plus petites => Vitesse plus rapide exemple 0x192
+								; Valeurs plus grandes => Vitesse moins rapide exemple 0x1B2
+								
+VITESSE_MAX		EQU		0x1A2   ; Valeur de vitesse maximale
+VITESSE_MIN		EQU		0x1B2   ; Valeur de vitesse minimale
 						
 						
 		AREA    |.text|, CODE, READONLY
@@ -78,6 +81,9 @@ VITESSE			EQU		0x1B2	; Valeures plus petites => Vitesse plus rapide exemple 0x19
 		EXPORT  MOTEUR_GAUCHE_AVANT
 		EXPORT  MOTEUR_GAUCHE_ARRIERE
 		EXPORT  MOTEUR_GAUCHE_INVERSE
+		EXPORT  MOTEUR_MAX_SPEED
+		EXPORT  MOTEUR_MIN_SPEED
+		EXPORT  MOTEUR_NORMAL_SPEED
 
 
 MOTEUR_INIT	
@@ -326,5 +332,40 @@ MOTEUR_GAUCHE_INVERSE
 		EOR	r0, r1, #GPIO_1
 		str	r0,[r6]
 		BX	LR
-
+		
+MOTEUR_MAX_SPEED
+		ldr	r6, =PWM0CMPA
+		mov	r0, #VITESSE_MAX
+		str	r0, [r6]
+		
+		ldr	r6, =PWM1CMPA
+		mov	r0,	#VITESSE_MAX
+		str	r0, [r6]
+		
+		BX LR
+		
+MOTEUR_MIN_SPEED
+		ldr	r6, =PWM0CMPA
+		mov	r0, #VITESSE_MIN
+		str	r0, [r6]
+		
+		ldr	r6, =PWM1CMPA
+		mov	r0,	#VITESSE_MIN
+		str	r0, [r6]
+		
+		BX LR
+		
+MOTEUR_NORMAL_SPEED
+		ldr	r6, =PWM0CMPA
+		mov	r0, #VITESSE
+		str	r0, [r6]
+		
+		ldr	r6, =PWM1CMPA
+		mov	r0,	#VITESSE
+		str	r0, [r6]
+		
+		BX LR
+		
+		
+		NOP
 		END

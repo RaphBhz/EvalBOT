@@ -5,7 +5,11 @@
 		AREA    |.text|, CODE, READONLY
 		ENTRY
 		EXPORT	__main
-		
+
+; Durée des boucles d'attente
+DUREE			EQU			0x002FFFFF
+DUREE_VIRAGE	EQU			0x014007FF
+	
 		;; The IMPORT command specifies that a symbol is defined in a shared object at runtime.
 		IMPORT	MOTEUR_INIT					; initialise les moteurs (configure les pwms + GPIO)
 		IMPORT  BUMPERS_INIT				; Initialise les Bumpers
@@ -17,6 +21,10 @@
 		IMPORT  MOTEUR_DROIT_AVANT			; moteur droit tourne vers l'avant
 		IMPORT  MOTEUR_DROIT_ARRIERE		; moteur droit tourne vers l'arrière
 		IMPORT  MOTEUR_DROIT_INVERSE		; inverse le sens de rotation du moteur droit
+		IMPORT  MOTEUR_MAX_SPEED			; définit la vitesse du moteur à sa valeur maximale
+		IMPORT  MOTEUR_NORMAL_SPEED			; définit la vitesse du moteur à sa valeur par défaut
+		IMPORT  MOTEUR_MIN_SPEED			; définit la vitesse du moteur à sa valeur minimale
+
 		
 		; Fonctions Moteur Gauche
 		IMPORT	MOTEUR_GAUCHE_ON			; activer le moteur gauche
@@ -73,6 +81,8 @@ STANDBY
 ; S'il y a 4 collisions consécutives, l'Evalbot recule et fait clignoter ses Leds
 
 LOOP	
+		BL MOTEUR_MIN_SPEED
+
 		; Evalbot avance droit devant
 		BL MOTEUR_DROIT_AVANT
 		BL MOTEUR_GAUCHE_AVANT
@@ -85,13 +95,13 @@ LOOP
 		BGE LOOP
 		
 		; L'Evalbot est coincé, il recule
+		BL MOTEUR_NORMAL_SPEED
 		BL MOTEUR_GAUCHE_INVERSE
 		BL MOTEUR_DROIT_INVERSE
-		
-		; On vérifie si on a atteint le nombre maximal de collisions
-		LDR r4, =0xAFFFFF 
+		LDR r4, =DUREE_VIRAGE
 		BL WAIT
 		
+		; On vérifie si on a atteint le nombre maximal de collisions
 		; Ajoute 1 au nombre de collisions, si on a enchaîné 4 collisions, on allume les LEDs
 		SUBS r3, #1
 		BEQ STUCK
@@ -99,27 +109,24 @@ LOOP
 		; Rotation à droite de l'Evalbot pendant 2 périodes, la LED du côté de la rotation s'allume pendant le virage
 		BL LED5_ON
 		BL MOTEUR_DROIT_INVERSE
-		LDR r4, =0xAFFFFF 
-		BL WAIT
-		LDR r4, =0xAFFFFF 
+		LDR r4, =DUREE_VIRAGE
 		BL WAIT
 		BL LEDS_OFF
 
-		
 		B LOOP
 
-		;; Boucle d'attente, on définit r4 a une valeur précise avant l'appel
+;; Boucle d'attente, on définit r4 a une valeur précise avant l'appel
 WAIT	
 		SUBS r4, #1
         BNE WAIT
 		BX	LR
 		
-		;; L'évalBOT est coincé, il s'arrêtte
+;; L'évalBOT est coincé, il s'arrêtte
 STUCK
 		BL MOTEUR_DROIT_OFF
 		BL MOTEUR_GAUCHE_OFF
 
-		;; L'évalBOT fait clignoter ses LEDs
+;; L'évalBOT fait clignoter ses LEDs
 WARNING 
 		BL LEDS_ON
 		
@@ -127,7 +134,7 @@ WARNING
 		CMP r5, #0
 		BEQ FORCE
 		
-		LDR r4, =0x0AFFFF
+		LDR r4, =DUREE
 		BL WAIT
 		
 		BL LEDS_OFF
@@ -136,15 +143,26 @@ WARNING
 		CMP r5, #0
 		BEQ FORCE
 
-		LDR r4, =0x0AFFFF
+		LDR r4, =DUREE
 		BL WAIT
 		
 		B WARNING
 		
+; L'évalBOT tente de forcer le mur devant lui
 FORCE
 		BL LEDS_OFF
+		BL MOTEUR_DROIT_ON
+		BL MOTEUR_GAUCHE_ON
+		BL MOTEUR_MAX_SPEED
+		BL MOTEUR_DROIT_AVANT
+		BL MOTEUR_GAUCHE_AVANT
+		
+		LDR r4, =0xFFFF 
+		BL WAIT
+		
+		BL MOTEUR_NORMAL_SPEED
+		BL STANDBY
 		
 		
-		NOP
 		NOP
         END
