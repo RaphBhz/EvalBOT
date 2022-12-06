@@ -59,7 +59,6 @@ SWITCH_INIT
 		
 READ_SWITCH1
 		;^^^^^^^^^^^^^^^^^^^^^^^^^^^^Lecture du contenu de la valeur d'activation du Switch 1
-		ldr r11, = GPIO_PORTD_BASE + (BROCHE6<<2)  ;; @data Register = @base + (mask<<2) ==> Switch
 
 		ldr r11, = GPIO_PORTD_BASE + (BROCHE6<<2)  ;; @data Register = @base + (mask<<2) ==> Switch
 		LDR r5, [r11]
@@ -69,7 +68,6 @@ READ_SWITCH1
 		
 READ_SWITCH2
 		;^^^^^^^^^^^^^^^^^^^^^^^^^^^^Lecture du contenu de la valeur d'activation du Switch 2
-		ldr r12, = GPIO_PORTD_BASE + (BROCHE7<<2)  ;; @data Register = @base + (mask<<2) ==> Switch
 
 		ldr r12, = GPIO_PORTD_BASE + (BROCHE7<<2)  ;; @data Register = @base + (mask<<2) ==> Switch
 		LDR r5, [r12]
