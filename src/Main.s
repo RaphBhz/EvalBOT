@@ -8,7 +8,7 @@
 
 ; Durée des boucles d'attente
 DUREE			EQU			0x002FFFFF
-DUREE_VIRAGE	EQU			0x014007FF
+DUREE_VIRAGE	EQU			0x01210000
 	
 		;; The IMPORT command specifies that a symbol is defined in a shared object at runtime.
 		IMPORT	MOTEUR_INIT					; initialise les moteurs (configure les pwms + GPIO)
@@ -161,6 +161,8 @@ FORCE
 		BL WAIT
 		
 		BL MOTEUR_NORMAL_SPEED
+		BL MOTEUR_DROIT_OFF
+		BL MOTEUR_GAUCHE_OFF
 		BL STANDBY
 		
 		
