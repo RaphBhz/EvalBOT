@@ -8,7 +8,7 @@
 
 ; Durée des boucles d'attente
 DUREE			EQU			0x002FFFFF
-DUREE_VIRAGE	EQU			0x01210000
+DUREE_VIRAGE	EQU			0x01270000
 	
 		;; The IMPORT command specifies that a symbol is defined in a shared object at runtime.
 		IMPORT	MOTEUR_INIT					; initialise les moteurs (configure les pwms + GPIO)
@@ -98,7 +98,7 @@ LOOP
 		BL MOTEUR_NORMAL_SPEED
 		BL MOTEUR_GAUCHE_INVERSE
 		BL MOTEUR_DROIT_INVERSE
-		LDR r4, =DUREE_VIRAGE
+		LDR r4, =DUREE_VIRAGE+DUREE+DUREE+DUREE
 		BL WAIT
 		
 		; On vérifie si on a atteint le nombre maximal de collisions
@@ -125,27 +125,24 @@ WAIT
 STUCK
 		BL MOTEUR_DROIT_OFF
 		BL MOTEUR_GAUCHE_OFF
+		LDR r5, =0x003F
 
 ;; L'évalBOT fait clignoter ses LEDs
 WARNING 
 		BL LEDS_ON
 		
-		BL READ_SWITCH1
 		CMP r5, #0
-		BEQ FORCE
+		BLE FORCE
+		SUB r5, #0x000F
 		
 		LDR r4, =DUREE
 		BL WAIT
 		
 		BL LEDS_OFF
 
-		BL READ_SWITCH1
-		CMP r5, #0
-		BEQ FORCE
-
 		LDR r4, =DUREE
 		BL WAIT
-		
+				
 		B WARNING
 		
 ; L'évalBOT tente de forcer le mur devant lui
@@ -157,7 +154,7 @@ FORCE
 		BL MOTEUR_DROIT_AVANT
 		BL MOTEUR_GAUCHE_AVANT
 		
-		LDR r4, =0xFFFF 
+		LDR r4, =DUREE+DUREE+DUREE+DUREE+DUREE+DUREE
 		BL WAIT
 		
 		BL MOTEUR_NORMAL_SPEED
